@@ -5,8 +5,11 @@ from pydantic import BaseModel
 import pandas as pd
 from datetime import date
 # import PyCurrency_Converter
-from currency_converter import CurrencyConverter 
+from currency_converter import CurrencyConverter
+from random import choice, randint
+import re
 
+app = FastAPI()
 
 data = pd.read_csv('main_carbon_data.csv')
 country_df = pd.read_csv('countries.csv')
@@ -285,13 +288,6 @@ class TypeCountry(str, Enum):
    b247 = 'South Africa',
    b248 = 'Zambia',
    b249 = 'Zimbabwe'
-
-
-
-
-
-
-
 
 class TypeMCC(str, Enum):
     string742 = '742',
@@ -596,15 +592,7 @@ class TypeMCC(str, Enum):
     string9405= '9405',
     string9406= '9406',
     string9702= '9702',
-    string9950= '9950' 
-
-
-
-
-
-
-
-
+    string9950= '9950'
 
 
 class BlogModel(BaseModel):
@@ -619,6 +607,57 @@ class BlogModel(BaseModel):
 app = FastAPI()
 
 
+# Assuming your lists c_shortened and mcc are defined in this script or imported
+c_shortened = [
+    'Andorra', 'United Arab Emirates', 'Afghanistan', 'Antigua and Barbuda', 'Anguilla',
+    # Add the rest of the countries here
+]
+
+mcc = [
+    '4119', '4121', '4131', '4214', '4215',
+    # Add the rest of the MCC values here
+]
+
+def process_text(input_text):
+    # Simplified country names dictionary for demonstration
+    country_names = {
+        'Andorra': 'AD', 'United Arab Emirates': 'AE', 'Afghanistan': 'AF',
+        # Add other countries as necessary...
+    }
+
+    # Convert the dictionary keys to a big regex pattern
+    country_names_pattern = r'\b(' + '|'.join(re.escape(key) for key in country_names.keys()) + r')\b'
+
+    # Regular expressions for amount and MCC
+    amount_pattern = r"\b\d+(\.\d+)?\b"
+    mcc_pattern = r"\b\d{4}\b"
+
+    # Search for country names, amounts, and MCCs in the input text
+    country_match = re.search(country_names_pattern, input_text, re.IGNORECASE)
+    amount_matches = re.findall(amount_pattern, input_text)
+    mcc_matches = re.findall(mcc_pattern, input_text)
+
+    country_code = country_names[country_match.group()] if country_match else None
+    amount = float(amount_matches[0]) if amount_matches else None
+    mcc = mcc_matches[0] if mcc_matches else None
+
+    return {
+        "countryCode": country_code,
+        "amount": amount,
+        "mcc": mcc
+    }
+
+# Example usage
+input_text = "The transaction was made in United Arab Emirates for an amount of 100.50 with MCC 5411."
+result = process_text(input_text)
+print(result)
+
+@app.get("/random-data")
+def get_random_data():
+    random_country = choice(c_shortened)
+    random_mcc = choice(mcc)
+    random_amount = randint(10, 100)
+    return {"country": random_country, "MCC": random_mcc, "amount": random_amount}
 
 @app.get("/")
 async def root():

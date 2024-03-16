@@ -4,13 +4,13 @@ from typing import Optional
 from pydantic import BaseModel
 import pandas as pd
 from datetime import date
-import PyCurrency_Converter
+# import PyCurrency_Converter
 from currency_converter import CurrencyConverter 
 
 
-data = pd.read_csv(r'C:\Users\MehdiMoghadam\OneDrive - Agilysis Limited\Desktop\Data Collector\FastAPI\Vechain\main_carbon_data.csv')
-country_df = pd.read_csv(r'C:\Users\MehdiMoghadam\OneDrive - Agilysis Limited\Desktop\Data Collector\FastAPI\Vechain\countries.csv')
-iso_df = pd.read_csv(r'C:\Users\MehdiMoghadam\OneDrive - Agilysis Limited\Desktop\Data Collector\FastAPI\Vechain\country-code-to-currency-code-mapping.csv')
+data = pd.read_csv('main_carbon_data.csv')
+country_df = pd.read_csv('countries.csv')
+iso_df = pd.read_csv('country-code-to-currency-code-mapping.csv')
 
 
 country = {}
@@ -34,9 +34,6 @@ def calculate_carbon(country_code, amount, df, country, iso, mcc):
     row = pd.DataFrame(df[df['MCC Code']==mcc])[country_code]
     print(euro_amount, row)
     return euro_amount * row.to_list()[0]
-    
-
-
 
 class TypeCountry(str, Enum):
    b1 =  'Andorra',

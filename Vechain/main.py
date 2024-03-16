@@ -652,12 +652,15 @@ input_text = "The transaction was made in United Arab Emirates for an amount of 
 result = process_text(input_text)
 print(result)
 
-@app.get("/random-data")
-def get_random_data():
-    random_country = choice(c_shortened)
-    random_mcc = choice(mcc)
-    random_amount = randint(10, 100)
-    return {"country": random_country, "MCC": random_mcc, "amount": random_amount}
+@app.get("/random-data/{n}")
+def get_random_data(n:int):
+    l = [] 
+    for i in range(n):
+        random_country = choice(c_shortened)
+        random_mcc = choice(mcc)
+        random_amount = randint(10, 100)
+        l.append({"country": random_country, "MCC": random_mcc, "amount": random_amount})
+    return l
 
 @app.get("/")
 async def root():

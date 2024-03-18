@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from enum import Enum
 from typing import Optional
 from pydantic import BaseModel
@@ -13,6 +14,16 @@ import requests
 
 app = FastAPI()
 # CORS(app)  # This enables CORS for all routes and origins
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 data = pd.read_csv('main_carbon_data.csv')
 country_df = pd.read_csv('countries.csv')
